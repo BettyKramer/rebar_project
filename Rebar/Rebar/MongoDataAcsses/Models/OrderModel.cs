@@ -3,10 +3,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace MongoDataAcsses.Models
 {
-    internal class OrderModel
+    public class OrderModel
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        //[BsonId]
+        //[BsonRepresentation(BsonType.ObjectId)]
         Guid Id { get; set; }
         public List<ShakeModel> shakes { get; set; }
         public string CustomerName { get; set; }

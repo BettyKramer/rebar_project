@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MongoDataAcsses.Models
 {
-    internal class SaleModel
+    public class SaleModel
     {
         public int price { get; set; }
         public string name { get; set; }

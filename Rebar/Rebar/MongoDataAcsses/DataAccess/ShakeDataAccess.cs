@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace MongoDataAcsses.DataAccess
 {
-    internal class ShakeDataAccess
+    public class ShakeDataAccess
     {
         private const string ConnectionString = "mongodb://127.0.0.1:27017";
         private const string DatabeseName = "menudb";
@@ -14,13 +14,13 @@ namespace MongoDataAcsses.DataAccess
             var db = client.GetDatabase(DatabeseName);
             return db.GetCollection<T>(collection);
         }
-        public async Task<List<ShakeModel>> GetAllShakes()
+        public List<ShakeModel> GetAllShakes()
         {
             var shakesCollaction = ConnectToMongo<ShakeModel>(MenuCollectionName);
-            var result = await shakesCollaction.FindAsync(_ => true);
+            var result = shakesCollaction.Find(_ => true);
             return result.ToList();
         }
-        public Task CreatSheke(ShakeModel shake)
+        public Task CreatShake(ShakeModel shake)
         {
             var shaksCollaction = ConnectToMongo<ShakeModel>(MenuCollectionName);
             return shaksCollaction.InsertOneAsync(shake);
