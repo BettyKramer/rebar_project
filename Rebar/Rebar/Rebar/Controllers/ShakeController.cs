@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Rebar.Controllers
 {
+   [ Route("api/shakes")]
     [ApiController]
-    [Route("[controller]")]
+
     public class ShakeController : ControllerBase
     {
         ShakeDataAccess myShaker = new ShakeDataAccess();

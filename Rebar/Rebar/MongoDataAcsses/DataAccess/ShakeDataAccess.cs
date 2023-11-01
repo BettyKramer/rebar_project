@@ -20,6 +20,16 @@ namespace MongoDataAcsses.DataAccess
             var result = shakesCollaction.Find(_ => true);
             return result.ToList();
         }
+        public bool isShakeExists(Guid shakeId)
+        {
+            var shakesCollaction = ConnectToMongo<ShakeModel>(MenuCollectionName);
+            var shake = shakesCollaction.Aggregate().Match(s => s.Id == shakeId).FirstOrDefaultAsync();
+
+            if(shake == null)
+                return false;
+
+            return shake != null;  
+        }
         public Task CreatShake(ShakeModel shake)
         {
             var shaksCollaction = ConnectToMongo<ShakeModel>(MenuCollectionName);
