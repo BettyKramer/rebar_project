@@ -13,8 +13,13 @@ namespace Rebar.Controllers
     {
         ShakeDataAccess myShaker = new ShakeDataAccess();
 
+        [HttpGet(Name = "GetShake")]
+        public void GetShakes()
+        {
+            myShaker.GetAllShakes();
+        }
+        
 
-        // myShaker.GetAllShakes();
         [HttpPost(Name = "CreateShake")]
         public async void createShake(ShakeModel shake)
         {

@@ -1,4 +1,5 @@
 ﻿using MongoDataAcsses.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -15,51 +16,63 @@ namespace MongoDataAcsses.DataAccess
         private const string ConnectionString = "mongodb://127.0.0.1:27017";
         private const string DatabeseName = "Ordersdb";
         private const string OrderCollection = "orders";
-        public IMongoCollection<T> ConnectToMongo<T>(in string collection)
+        public IMongoCollection<BsonDocument> ConnectToMongo<T>(in string collection)
         {
             var client = new MongoClient(ConnectionString);
             var db = client.GetDatabase(DatabeseName);
-            return db.GetCollection<T>(collection);
+            return db.GetCollection <BsonDocument> (collection);
         }
-        public List<OrderModel> GetAllOrders()
+        //public BsonDocument <OrderModel> GetAllOrders()
+        //{
+        //    var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
+    
+        //    return ordersCollection;
+        //}
+        public int GetNumberOfOrders()
         {
             var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
-            var result = ordersCollection.Find(_ => true);
-            return result.ToList();
+
+            var count = ordersCollection.CountDocuments(Builders<BsonDocument>.Filter.Empty);
+
+            return Convert.ToInt32(count);
         }
         public Task CreatOrder(OrderModel order)
         {
             var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
-            return ordersCollection.InsertOneAsync(order);
-        }
-        public Task UpdatShake(OrderModel order)
-        {
-            var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
-            var filter = Builders<OrderModel>.Filter.Eq("Name", order.startOrder);
-            return ordersCollection.ReplaceOneAsync(filter, order, new ReplaceOptions { IsUpsert = true });
+
+            return ordersCollection.InsertOne(order);
         }
         public Task DeleteOrder(OrderModel order)
         {
             var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
             return ordersCollection.DeleteOneAsync(s => order.startOrder == order.startOrder);
         }
-        //public bool isSizeVlide(Guid shakeId)
-        //{
-        //    var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
-        //    List<ShakeOrder> shakes = ordersCollection.Aggregate().Match(s => s.shakes == shakeId).FirstOrDefaultAsync();
+        public bool isSizeVlide(Guid shakeId)
+        {
+            var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
 
+            var filter = Builders<BsonDocument>.Filter.Regex("Id", new BsonRegularExpression(shakeId.ToString()));
 
-        //    {
-        //        if (!shake.size.Equals("M") || !shake.size.Equals("L") || !shake.size.Equals("S"))
-        //            return false;
-        //    }
-        //    return true;
-        //}
+            foreach (var order in ordersCollection.Find(filter).ToListAsync().Result)
+            {
+               char size = (char)order["size"];
+
+                if (!size.Equals('S') || !size.Equals('M') || !size.Equals('L'))
+                    return false;
+
+            }//end foreach
+            return true;
+        }
         public bool IsNameValied(string name)
         {
             if(string.IsNullOrEmpty(name)) return false;
             else if(name.ToList().Count>20|| name.ToList().Count<3) return false;
             return true;
         }
+        //public int GetSumOfPrices(Guid id)
+        //{
+        //    var ordersCollection = ConnectToMongo<OrderModel>(OrderCollection);
+        //    int sum=ordersCollection.
+        //}
     }
 }

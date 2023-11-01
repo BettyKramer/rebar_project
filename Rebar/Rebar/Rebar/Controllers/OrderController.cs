@@ -5,20 +5,18 @@ using Rebar.Models;
 
 namespace Rebar.Controllers
 {
-    [Route("api/order")]
     [ApiController]
-
+    [Route("[controller]")]
     public class OrderController : ControllerBase
     {
         OrderDataAccess myOrders = new OrderDataAccess();
-        [HttpPost(Name ="CreateOrder")]
+        [HttpPost(Name = "CreateOrder")]
         public async void CreateOrder(OrderModel order)
         {
-            await myOrders.(order);
+            await myOrders.CreatOrder(order);
         }
-
         [HttpPost(Name = "CreateNewOrder")]
-        public async void GetNewOrder(List<Guid> shakes,string CustomerName, DateTime orderStart)
+        public async void GetNewOrder(List<Guid> shakes, string CustomerName, DateTime orderStart)
         {
             if (shakes.Count > 10)
             {
@@ -33,19 +31,44 @@ namespace Rebar.Controllers
                     await Console.Out.WriteLineAsync("shake doesnt exist");
                     return;
                 }
-            } 
-                //3 validate size 
+            }
+            OrderDataAccess orders = new OrderDataAccess();
+            //3 validate size 
+            foreach (var shake in shakes) { 
+            {
+                    if (!orders.isSizeVlide(shake))
+                    {
+                        await Console.Out.WriteLineAsync("size is not valied");
+                        return;
+                    }
+            }
+            }
 
-             OrderDataAccess orders = new OrderDataAccess();
-            //4 validate name (between 3-12)
+            
+
             if (!orders.IsNameValied(CustomerName))
             {
                 await Console.Out.WriteLineAsync("name is not valied!!!");
                 return;
             }
-            CreateOrder(new OrderModel() { shakes = shakes, CustomerName = "betty", SumPrices = 10, startOrder = orderStart, endOrder = DateTime.Now });
-            //6 return to client orderid 
-            
+            try {
+                CreateOrder(new OrderModel() { shakes = shakes, CustomerName = "betty", SumPrices = 10, startOrder = orderStart, endOrder = DateTime.Now });
+                await Console.Out.WriteLineAsync("we got your order");
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync("something went wrong with your order....");
+            }
+        }
+
+        [HttpGet(Name = "CloseCashier")]
+        public void CloseCashier()
+        {
+            OrderDataAccess orders = new OrderDataAccess();
+            Console.WriteLine("number of orders: " + orders.GetNumberOfOrders());
+
         }
     }
 }
+
+
